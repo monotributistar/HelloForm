@@ -1,0 +1,7 @@
+Me vas a ayudar a iniciar le proyecto demo de  cierta funcionalidad que necesito, 
+necesito tener la posibilidad de crear trabajos para  individuos que dan  servicio de plomería, electricidad, reparaciones, limpieza, etc. ,  la idea es uberizar ese sector.
+Factores a solucionar:
+1) romper la barrera idiomática y de personas de edad no tan  familiarizada con las apps, para que los técnicos y los usuarios que contraten el servicio  puedan completar los formularios de signIn  y luego las acciones requeridas para la administración de los trabajos, y actualizar el estado  de los trabajos abiertos.
+2) crear una estructura de trabajo que se almacena para reflejar el ciclo de vida completo  , y otros que en tiempo real se pueden actualizar, con la información relativa a l proveedor de servicios  dirigiéndose  al domicilio, agregar materiales, finalizar el trabajo ,  etc , algo así como Uber  cuando el viaje está activo.
+3) el alcance de esta prueba de concepto es crear una librería y un espacio de prueba que maneje  una estructura de componentes que permitan crear. Formularios , con sus respectivos tipo de input,  acciones, también se pueden agregar botones o acciones custom, cada type de input del formulario , puede tener un contexto para guiar a la persona y al asistente como se llena dicho campo ,  lo mismos aplica al formulario cuenta con su propio prompt que explica .
+el back-end va a ser supabase, y el front en  react   o  vue .  Escuchó tus sugerencias 
