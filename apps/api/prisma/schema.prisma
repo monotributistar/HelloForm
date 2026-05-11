@@ -1,0 +1,125 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model FormSession {
+  id          String       @id
+  tenantId    String
+  surveyId    String
+  totalSteps  Int
+  currentStep Int          @default(0)
+  completed   Boolean      @default(false)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  answers     FormAnswer[]
+
+  @@index([tenantId])
+  @@index([surveyId])
+}
+
+model FormAnswer {
+  id         String      @id @default(cuid())
+  sessionId  String
+  fieldId    String
+  valueJson  String
+  mode       String
+  attempts   Int         @default(1)
+  confirmed  Boolean     @default(false)
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  session    FormSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, fieldId])
+  @@index([fieldId])
+}
+
+model AIUsageLog {
+  id               String   @id @default(cuid())
+  tenantId         String
+  sessionId        String?
+  campaignId       String?
+  surveyId         String?
+  provider         String
+  model            String
+  operation        String
+  units            Int
+  estimatedCostUsd Float
+  latencyMs        Int?
+  createdAt        DateTime @default(now())
+
+  @@index([tenantId])
+  @@index([sessionId])
+  @@index([surveyId])
+  @@index([createdAt])
+}
+
+model PricingRule {
+  id            String   @id @default(cuid())
+  tenantId      String
+  provider      String
+  model         String
+  operation     String
+  usdPer1kUnits Float
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([tenantId, provider, model, operation])
+  @@index([tenantId])
+}
+
+model TenantUser {
+  id        String   @id @default(cuid())
+  tenantId  String
+  email     String
+  name      String
+  role      String
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([tenantId, email])
+  @@index([tenantId])
+}
+
+model Campaign {
+  id        String   @id @default(cuid())
+  tenantId  String
+  name      String
+  status    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([tenantId])
+}
+
+model Survey {
+  id         String   @id @default(cuid())
+  tenantId   String
+  campaignId String?
+  name       String
+  status     String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([tenantId])
+  @@index([campaignId])
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  tenantId   String
+  actorEmail String
+  action     String
+  resource   String
+  resourceId String
+  payload    String
+  createdAt  DateTime @default(now())
+
+  @@index([tenantId])
+  @@index([createdAt])
+}

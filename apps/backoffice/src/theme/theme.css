@@ -1,0 +1,47 @@
+:root {
+  --bg: #f5f7fb;
+  --surface: #ffffff;
+  --surface-2: #f8fafc;
+  --text: #10233f;
+  --muted: #5d708f;
+  --primary: #0b63f6;
+  --primary-strong: #084cc0;
+  --border: #dbe4f0;
+  --danger: #c03744;
+  --shadow: 0 8px 28px rgba(16, 35, 63, 0.08);
+  --radius: 12px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: radial-gradient(circle at 10% 10%, #edf3ff, var(--bg));
+  color: var(--text);
+  font-family: "IBM Plex Sans", "Avenir Next", "Segoe UI", sans-serif;
+}
+
+.hf-page {
+  max-width: 1040px;
+  margin: 40px auto;
+  padding: 0 16px 40px;
+}
+
+.hf-title {
+  margin: 0 0 8px;
+  font-size: 32px;
+  line-height: 1.1;
+}
+
+.hf-subtitle {
+  margin: 0 0 20px;
+  color: var(--muted);
+}
+
+.hf-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}

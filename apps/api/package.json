@@ -1,0 +1,26 @@
+{
+  "name": "@helloform/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "NODE_ENV=test DATABASE_URL=file:./test.db vitest run",
+    "lint": "tsc -p tsconfig.json --noEmit",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev --name init",
+    "prisma:push": "prisma db push",
+    "db:dev:init": "./scripts-db-dev-init.sh",
+    "db:dev:check": "prisma db execute --stdin --url file:./dev.db < ./prisma/sql/check.sql"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.22.0",
+    "@helloform/domain": "0.1.0",
+    "@helloform/ai-gateway": "0.1.0",
+    "fastify": "^5.2.1"
+  },
+  "devDependencies": {
+    "prisma": "^5.22.0",
+    "vitest": "^2.1.9"
+  }
+}

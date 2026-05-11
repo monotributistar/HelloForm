@@ -1,0 +1,27 @@
+# dependencies
+node_modules/
+
+# builds
+**/dist/
+
+# env
+.env
+.env.*
+!.env.example
+
+# databases
+*.db
+*.db-journal
+
+# logs
+*.log
+npm-debug.log*
+
+# cache
+.DS_Store
+.vscode/
+.idea/
+coverage/
+
+# temp
+/tmp/

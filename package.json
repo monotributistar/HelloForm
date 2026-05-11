@@ -1,0 +1,20 @@
+{
+  "name": "helloform-poc",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run -w @helloform/domain build && npm run -w @helloform/ai-gateway build && npm run -w @helloform/api build && npm run -w @helloform/frontend build && npm run -w @helloform/backoffice build",
+    "test": "npm run -w @helloform/domain test && npm run -w @helloform/ai-gateway test && npm run -w @helloform/api test && npm run -w @helloform/frontend test && npm run -w @helloform/backoffice test",
+    "test:watch": "npm run -w @helloform/domain test:watch",
+    "lint": "npm run -w @helloform/domain lint && npm run -w @helloform/ai-gateway lint && npm run -w @helloform/domain build && npm run -w @helloform/ai-gateway build && npm run -w @helloform/api lint && npm run -w @helloform/frontend lint && npm run -w @helloform/backoffice lint",
+    "db:dev:init": "npm run -w @helloform/api db:dev:init"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.17",
+    "typescript": "^5.8.3"
+  }
+}
