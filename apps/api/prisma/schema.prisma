@@ -123,3 +123,28 @@ model AuditLog {
   @@index([tenantId])
   @@index([createdAt])
 }
+
+model TenantHelpConfig {
+  id           String   @id @default(cuid())
+  tenantId     String   @unique
+  enabled      Boolean  @default(false)
+  channelsJson String   @default("[]")
+  hoursJson    String?
+  contactLabel String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model HandoffRequest {
+  id          String   @id @default(cuid())
+  tenantId    String
+  sessionId   String
+  channel     String
+  reason      String
+  status      String   @default("open")
+  summaryJson String
+  createdAt   DateTime @default(now())
+
+  @@index([tenantId, status])
+  @@index([sessionId])
+}

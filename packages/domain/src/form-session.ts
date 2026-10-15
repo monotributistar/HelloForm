@@ -1,3 +1,5 @@
+import { createDefaultCommProfile, updateCommProfile, type CommProfile, type CommSignals } from './comm-profile.js';
+
 export type InputMode = 'manual' | 'chat' | 'voice';
 
 export interface FormSessionFieldState {
@@ -15,6 +17,8 @@ export interface FormSessionState {
   totalSteps: number;
   completed: boolean;
   fields: Record<string, FormSessionFieldState>;
+  /** Optional so sessions created before the communication profile existed stay valid. */
+  commProfile?: CommProfile;
 }
 
 export interface SaveFieldInput {
@@ -80,3 +84,8 @@ export const saveFieldValue = (state: FormSessionState, input: SaveFieldInput): 
 export const correctFieldValue = (state: FormSessionState, input: SaveFieldInput): FormSessionState => {
   return saveFieldValue(state, input);
 };
+
+export const applyCommSignals = (state: FormSessionState, signals: CommSignals): FormSessionState => ({
+  ...state,
+  commProfile: updateCommProfile(state.commProfile ?? createDefaultCommProfile(), signals)
+});

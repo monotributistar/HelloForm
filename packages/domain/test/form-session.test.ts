@@ -4,7 +4,8 @@ import {
   createFormSession,
   nextStep,
   previousStep,
-  saveFieldValue
+  saveFieldValue,
+  applyCommSignals
 } from '../src/form-session.js';
 
 describe('form-session domain', () => {
@@ -45,5 +46,24 @@ describe('form-session domain', () => {
 
     expect(state.fields.full_name.value).toBe('Ana Maria');
     expect(state.fields.full_name.attempts).toBe(2);
+  });
+
+  it('la sesion no tiene perfil de comunicacion por defecto (retrocompatible)', () => {
+    expect(createFormSession('s1', 'survey-a', 2).commProfile).toBeUndefined();
+  });
+
+  it('aplica senales de comunicacion creando el perfil por defecto si falta', () => {
+    const state = applyCommSignals(createFormSession('s1', 'survey-a', 2), { failedAttempts: 2 });
+    expect(state.commProfile?.verbosity).toBe('short');
+    expect(state.commProfile?.language).toBe('es-AR');
+  });
+
+  it('aplica senales sobre un perfil existente sin tocar el resto de la sesion', () => {
+    let state = createFormSession('s1', 'survey-a', 3);
+    state = nextStep(state);
+    state = applyCommSignals(state, { userAskedForVoice: true });
+    state = applyCommSignals(state, { failedAttempts: 3 });
+    expect(state.currentStep).toBe(1);
+    expect(state.commProfile).toMatchObject({ inputMode: 'voice', verbosity: 'short', repeatConfirmations: true });
   });
 });

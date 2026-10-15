@@ -5,6 +5,7 @@ HelloForm is a multi-tenant form platform POC with:
 - Separate operations backoffice (`apps/backoffice`)
 - API/control plane (`apps/api`)
 - Agent-assisted form completion (chat + STT + TTS via Hugging Face Spaces)
+- Adaptive communication profile, explain mode and human handoff per tenant (see `docs/COMM_AND_HANDOFF.md`)
 
 ## Monorepo Structure
 

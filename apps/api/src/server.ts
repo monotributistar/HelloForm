@@ -1,5 +1,13 @@
 import Fastify, { type FastifyReply, type FastifyRequest } from 'fastify';
-import { normalizeSurveyContext, type InputMode } from '@helloform/domain';
+import {
+  normalizeSurveyContext,
+  parseHumanHelpConfig,
+  type CommProfile,
+  type HelpChannel,
+  type HandoffReason,
+  type HumanHelpConfig,
+  type InputMode
+} from '@helloform/domain';
 import { HuggingFaceProvider } from '@helloform/ai-gateway';
 import { prisma } from './lib/prisma.js';
 import { sessionRepo } from './lib/session-repo.js';
@@ -7,6 +15,7 @@ import { usageLogRepo } from './lib/usage-log-repo.js';
 import { estimateCostUsdWithUnitPrice, type OperationType } from './lib/costs.js';
 import { metricsRepo } from './lib/metrics-repo.js';
 import { pricingRepo } from './lib/pricing-repo.js';
+import { HANDOFF_REASONS, handoffRepo, helpConfigRepo } from './lib/help-repo.js';
 import { runAgentTurn } from './lib/agent-orchestrator.js';
 import { callHFStt, callHFTts, hfConfigFromEnv } from './lib/hf-services.js';
 
@@ -65,6 +74,8 @@ export function buildApp() {
         surveyHints?: string[];
         groupName?: string;
         groupHints?: string[];
+        surveyExplanations?: string[];
+        groupExplanations?: string[];
       };
       field: {
         fieldId: string;
@@ -74,10 +85,19 @@ export function buildApp() {
         fieldHints?: string[];
         fieldRules?: string[];
         fieldExamples?: string[];
+        fieldExplanations?: string[];
+        fieldExampleHelp?: string[];
+        sensitive?: boolean;
       };
+      commProfile?: CommProfile;
+      /** When set and humanHelp is omitted, the tenant's stored help config is used. */
+      tenantId?: string;
+      humanHelp?: HumanHelpConfig;
+      userAskedForPerson?: boolean;
     };
 
-    return runAgentTurn(fetch, body);
+    const humanHelp = body.humanHelp ?? (body.tenantId ? await helpConfigRepo.get(body.tenantId) : undefined);
+    return runAgentTurn(fetch, { ...body, humanHelp });
   });
 
   app.post('/agent/stt', async (request) => {
@@ -395,6 +415,55 @@ export function buildApp() {
 
     if (!updated) return reply.status(404).send({ error: 'Session not found' });
     return updated;
+  });
+
+  app.get('/tenants/:tenantId/help-config', async (request) => {
+    const { tenantId } = request.params as { tenantId: string };
+    return helpConfigRepo.getView(tenantId);
+  });
+
+  app.put('/tenants/:tenantId/help-config', async (request, reply) => {
+    const { tenantId } = request.params as { tenantId: string };
+    const auth = requireAdmin(request, reply, tenantId);
+    if (!auth) return;
+
+    const parsed = parseHumanHelpConfig(request.body);
+    if (!parsed.ok) return reply.status(400).send({ error: parsed.error });
+
+    const saved = await helpConfigRepo.upsert(tenantId, parsed.value);
+    await audit(tenantId, auth.actorEmail, 'help_config.upsert', 'tenant_help_config', tenantId, parsed.value);
+    return saved;
+  });
+
+  app.post('/sessions/:sessionId/handoff', async (request, reply) => {
+    const { sessionId } = request.params as { sessionId: string };
+    const body = (request.body ?? {}) as { channel?: HelpChannel; reason?: HandoffReason };
+
+    const session = await sessionRepo.get(sessionId);
+    if (!session) return reply.status(404).send({ error: 'Session not found' });
+
+    const config = await helpConfigRepo.get(session.tenantId);
+    if (!config.enabled) return reply.status(409).send({ error: 'Human help is not enabled for this tenant' });
+
+    if (!body.channel || !config.channels.includes(body.channel)) {
+      return reply.status(400).send({ error: 'Channel is not offered by this tenant' });
+    }
+    if (!body.reason || !HANDOFF_REASONS.includes(body.reason)) {
+      return reply.status(400).send({ error: 'Invalid handoff reason' });
+    }
+
+    return handoffRepo.create(session, body.channel, body.reason);
+  });
+
+  app.get('/tenants/:tenantId/handoffs', async (request, reply) => {
+    const { tenantId } = request.params as { tenantId: string };
+    const auth = requireAdmin(request, reply, tenantId);
+    if (!auth) return;
+
+    const query = request.query as { page?: string; pageSize?: string };
+    const { page, pageSize, skip } = listParams(query);
+    const { items, total } = await handoffRepo.listOpen(tenantId, skip, pageSize);
+    return { items, total, page, pageSize };
   });
 
   app.post('/pricing-rules', async (request, reply) => {

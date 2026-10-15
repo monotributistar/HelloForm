@@ -10,7 +10,7 @@ fi
 DB_PATH="./dev.db"
 rm -f "$DB_PATH"
 
-for SQL_FILE in ./prisma/migrations/0001_init/migration.sql ./prisma/migrations/0002_pricing_rules/migration.sql ./prisma/migrations/0003_backoffice_admin/migration.sql; do
+for SQL_FILE in ./prisma/migrations/0001_init/migration.sql ./prisma/migrations/0002_pricing_rules/migration.sql ./prisma/migrations/0003_backoffice_admin/migration.sql ./prisma/migrations/0004_help_handoff/migration.sql; do
   cat "$SQL_FILE" | npx prisma db execute --stdin --url "file:./dev.db"
 done
 

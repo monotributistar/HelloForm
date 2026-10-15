@@ -5,6 +5,10 @@ export interface ContextBlock {
   hints: string[];
   rules: string[];
   examples: string[];
+  /** Why the data is asked and what happens next; the agent explains instead of only asking. */
+  explanations: string[];
+  /** Where to find the data (e.g. on a document); concrete help for a specific field. */
+  exampleHelp: string[];
 }
 
 export interface SurveyContextInput {
@@ -28,7 +32,9 @@ const createBlock = (level: ContextLevel, source: Record<string, unknown> | unde
   level,
   hints: asStringArray(source?.hints),
   rules: asStringArray(source?.rules),
-  examples: asStringArray(source?.examples)
+  examples: asStringArray(source?.examples),
+  explanations: asStringArray(source?.explanations),
+  exampleHelp: asStringArray(source?.exampleHelp)
 });
 
 export const normalizeSurveyContext = (input: SurveyContextInput): NormalizedSurveyContext => {

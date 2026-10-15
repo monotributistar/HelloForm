@@ -27,6 +27,7 @@ Validar un flujo de formulario asistido (manual + chat + voz) con enfoque en com
 2. Politica de reintentos y temperatura conversacional.
 3. Sesion de formulario con avance/retroceso y guardado parcial.
 4. Confirmacion explicita antes de persistir respuesta asistida.
+5. Modo explicar, perfil de comunicacion adaptativo y derivacion a una persona (ver `docs/COMM_AND_HANDOFF.md`).
 
 ## Hugging Face - Integracion prevista
 - Soporte de `modelRef` por tenant: `org/model`, `revision`, `endpointUrl` opcional.

@@ -33,4 +33,28 @@ describe('normalizeSurveyContext', () => {
     expect(result.group.rules).toEqual([]);
     expect(result.field.examples).toEqual([]);
   });
+
+  it('normaliza explicaciones y ayuda de ejemplos por nivel', () => {
+    const result = normalizeSurveyContext({
+      surveyContext: { explanations: ['Es para armar tu contrato'] },
+      groupContext: { explanations: [42, 'Lo usamos para contactarte'] },
+      fieldContext: {
+        explanations: ['Lo pedimos para identificarte', '  '],
+        exampleHelp: ['El CUIL esta en tu DNI, debajo del numero', null]
+      }
+    });
+
+    expect(result.survey.explanations).toEqual(['Es para armar tu contrato']);
+    expect(result.group.explanations).toEqual(['Lo usamos para contactarte']);
+    expect(result.field.explanations).toEqual(['Lo pedimos para identificarte']);
+    expect(result.field.exampleHelp).toEqual(['El CUIL esta en tu DNI, debajo del numero']);
+    expect(result.survey.exampleHelp).toEqual([]);
+  });
+
+  it('retorna arreglos vacios de explicaciones cuando no hay contexto', () => {
+    const result = normalizeSurveyContext({});
+
+    expect(result.field.explanations).toEqual([]);
+    expect(result.field.exampleHelp).toEqual([]);
+  });
 });
